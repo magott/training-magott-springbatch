@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<job id="spurs" xmlns="http://www.springframework.org/schema/batch">
+		<step id="fileImport">
+			<tasklet transaction-manager="transactionManager">
+				<chunk commit-interval="10" reader="resultsReader" writer="resultsConsoleWriter"></chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="resultsReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="classpath:data/spurs.csv" />
+		<property name="linesToSkip" value="1" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer">
+					<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+						<property name="names" value="MatchId, Day, Date, Competition, Opposition, Venue, HalfTimeScore, SpursGoals, OppositionGoals, Result"/>
+						<property name="delimiter" value=","/>
+						<property name="strict" value="false" />
+					</bean>
+				</property>
+				<property name="fieldSetMapper">
+					<bean class="no.magott.training.ex1.SpursMatchFieldSetMapper" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="resultsConsoleWriter" class="no.magott.training.ex1.ConsoleItemWriter"/>
+
+
+
+</beans>
