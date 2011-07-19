@@ -45,6 +45,14 @@ public class SpursMatch {
 		this.spursGoals = spursGoals;
 		this.oppositionGoals = oppositionGoals;
 	}
+	
+	/**
+	 * Imported CSV file has empty lines between seasons, these lines will have date as null
+	 * @return true if object contains valid match data
+	 */
+	public boolean isValid(){
+		return date!=null;
+	}
 
 	public boolean isSpursWin(){
 		return spursGoals > oppositionGoals;

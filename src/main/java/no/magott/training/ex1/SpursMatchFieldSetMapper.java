@@ -40,7 +40,7 @@ public class SpursMatchFieldSetMapper implements FieldSetMapper<SpursMatch> {
 		String halfTimeScore = fieldSet.readString("HalfTimeScore");
 		int spursGoals = fieldSet.readInt("SpursGoals",0);
 		int oppositionGoals = fieldSet.readInt("OppositionGoals", 0);
-		Date date = fieldSet.readDate("Date", "MMM d, YYYY",null);
+		Date date = fieldSet.readDate("Date", "MMM d, yyyy",null);
 		
 		return new SpursMatch(matchId, day, date, competition, opposition, venue, halfTimeScore, spursGoals, oppositionGoals);
 	}

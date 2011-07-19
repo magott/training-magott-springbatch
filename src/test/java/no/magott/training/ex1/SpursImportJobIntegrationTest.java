@@ -52,7 +52,7 @@ public class SpursImportJobIntegrationTest extends JobLauncherTestUtils{
 		int lineNumber = 1;//Reader configured to skip first (header) row
 		
 		spursMatchReader.open(new ExecutionContext());
-		//Will skipp through first 141 rows in file
+		//Will skip through first 141 rows in file
 		while(lineNumber++ < 141 ){
 			spursMatchReader.read();
 		}
