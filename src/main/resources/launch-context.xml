@@ -25,10 +25,10 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-<!-- 	<jdbc:initialize-database data-source="dataSource"> -->
-<!-- 		<jdbc:script location="${batch.schema.script}" /> -->
-<!-- 		<jdbc:script location="classpath:business-schema.sql" /> -->
-<!-- 	</jdbc:initialize-database> -->
+	<jdbc:initialize-database data-source="dataSource">
+		<jdbc:script location="${batch.schema.script}" />
+		<jdbc:script location="classpath:business-schema.sql" />
+	</jdbc:initialize-database>
 
 	<batch:job-repository id="jobRepository" />
 
