@@ -5,7 +5,7 @@
 
 	<job id="spurs" xmlns="http://www.springframework.org/schema/batch">
 		<step id="fileImport">
-			<tasklet transaction-manager="transactionManager">
+			<tasklet>
 				<chunk commit-interval="10" reader="resultsReader" processor="matchFilter" writer="resultsDbWriter"></chunk>
 			</tasklet>
 		</step>

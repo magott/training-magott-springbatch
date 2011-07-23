@@ -13,18 +13,24 @@
 				<chunk reader="nokReader" processor="exchangeRateFilter" writer="exchangeRateDbWriter" commit-interval="10" />
 			</tasklet>
 		</step>
-		<step id="gbpImport" next="nokGbp">
+		<step id="gbpImport" next="nokGbpPartitioned">
 			<tasklet>
 				<chunk reader="gbpReader" processor="exchangeRateFilter" writer="exchangeRateDbWriter" commit-interval="10" />
 			</tasklet>
 		</step>
-		<step id="nokGbp">
-			<tasklet task-executor="taskExecutor" throttle-limit="10">
-				<chunk reader="exchangeRateDbReader" processor="exchangeRateProducer" writer="exchangeRateReverseDbWriter"
-					commit-interval="10" />
-			</tasklet>
+		<step id="nokGbpPartitioned">
+			<partition step="nokGbp" partitioner="partitioner">
+				<handler grid-size="5" task-executor="taskExecutor" />
+			</partition>
 		</step>
 	</job>
+
+	<step id="nokGbp" xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="exchangeRateDbReader" processor="exchangeRateProducer" writer="exchangeRateReverseDbWriter"
+				commit-interval="10" />
+		</tasklet>
+	</step>
 
 	<bean id="nokReader" parent="currencyReader">
 		<property name="resource" value="classpath:data/NOKEUR.csv" />
@@ -72,11 +78,35 @@
 		</property>
 	</bean>
 
-	<bean id="exchangeRateDbReader" class="no.magott.training.ex2.MultiThreadedExchangeRateItemReader">
+	<bean id="exchangeRateDbReader" class="org.springframework.batch.item.database.JdbcPagingItemReader" scope="step">
 		<property name="dataSource" ref="dataSource" />
+		<property name="rowMapper">
+			<bean class="no.magott.training.ex2.ExchangeRateRowMapper" />
+		</property>
+		<property name="queryProvider">
+			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+				<property name="sortKey" value="ID" />
+				<property name="selectClause" value="SELECT ID, EXCHANGE_DATE, FROM_CURRENCY, TO_CURRENCY, EXCHANGE_RATE" />
+				<property name="fromClause" value="FROM EXCHANGE_RATE" />
+				<property name="whereClause" value="WHERE ID >= :min AND ID &lt;= :max" />
+			</bean>
+		</property>
+		<property name="parameterValues">
+			<map>
+				<entry key="min" value="#{stepExecutionContext[minValue]}" />
+				<entry key="max" value="#{stepExecutionContext[maxValue]}" />
+			</map>
+		</property>
 	</bean>
 
 	<bean id="exchangeRateProducer" class="no.magott.training.ex2.ExchangeRateProducerItemProcessor" />
+
+	<bean id="partitioner" class="no.magott.training.ex2.ColumnRangePartitioner">
+		<property name="table" value="EXCHANGE_RATE" />
+		<property name="column" value="ID" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
 	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="4" />

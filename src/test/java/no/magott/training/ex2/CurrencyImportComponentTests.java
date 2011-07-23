@@ -65,7 +65,7 @@ public class CurrencyImportComponentTests {
 	@Test 
 	public void canReadWithJdbcReader() throws Exception{
 		dbReader.open(new ExecutionContext());
-		ExchangeRate exchangeRate = dbReader.read();
+		dbReader.read();
 	}
 	
 	@Test
