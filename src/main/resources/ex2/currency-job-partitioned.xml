@@ -20,7 +20,7 @@
 		</step>
 		<step id="nokGbpPartitioned">
 			<partition step="nokGbp" partitioner="partitioner">
-				<handler grid-size="5" task-executor="taskExecutor" />
+				<handler grid-size="2" task-executor="taskExecutor" />
 			</partition>
 		</step>
 	</job>
