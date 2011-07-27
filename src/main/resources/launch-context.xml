@@ -26,7 +26,9 @@
 	</bean>
 
 	<jdbc:initialize-database data-source="dataSource">
+		<jdbc:script location="${batch.drops.script}" />
 		<jdbc:script location="${batch.schema.script}" />
+		<jdbc:script location="classpath:business-schema-drop.sql" />
 		<jdbc:script location="classpath:business-schema.sql" />
 	</jdbc:initialize-database>
 

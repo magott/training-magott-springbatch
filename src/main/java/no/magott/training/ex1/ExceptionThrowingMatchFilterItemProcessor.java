@@ -15,23 +15,40 @@
  */
 package no.magott.training.ex1;
 
-import org.springframework.batch.item.ItemProcessor;
+import java.util.Random;
 
 /**
  * @author Morten Andersen-Gott
- *
+ * 
  */
-public class MatchFilterItemProcessor implements ItemProcessor<SpursMatch, SpursMatch> {
+public class ExceptionThrowingMatchFilterItemProcessor extends MatchFilterItemProcessor{
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
+	private boolean exceptionThrown = false;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
 	 */
 	@Override
 	public SpursMatch process(SpursMatch item) throws Exception {
-		if(!item.isValid()){
-			return null;
-		}
-		return item;
+		throwOnRandom();
+		return super.process(item);
 	}
-	
+
+	/**
+	 * 
+	 */
+	private void throwOnRandom() {
+		if (exceptionThrown) {
+			return;
+		}
+		if (1 == new Random().nextInt(100)) {
+			exceptionThrown = true;
+			throw new RuntimeException("Planned random exception");
+		}
+
+	}
+
 }

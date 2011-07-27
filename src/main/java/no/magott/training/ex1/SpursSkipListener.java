@@ -15,23 +15,33 @@
  */
 package no.magott.training.ex1;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.SkipListener;
 
 /**
  * @author Morten Andersen-Gott
  *
  */
-public class MatchFilterItemProcessor implements ItemProcessor<SpursMatch, SpursMatch> {
+public class SpursSkipListener implements SkipListener<SpursMatch, SpursMatch> {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemProcessor#process(java.lang.Object)
-	 */
-	@Override
-	public SpursMatch process(SpursMatch item) throws Exception {
-		if(!item.isValid()){
-			return null;
-		}
-		return item;
-	}
+	private static final Log logger = LogFactory.getLog(SpursSkipListener.class);
 	
+	@Override
+	public void onSkipInRead(Throwable t) {
+		logger.warn("Skip in read, may require manual intervention", t);
+	}
+
+	@Override
+	public void onSkipInWrite(SpursMatch item, Throwable t) {
+		logger.warn("Skip in write for item " + item, t);
+		
+	}
+
+	@Override
+	public void onSkipInProcess(SpursMatch item, Throwable t) {
+		logger.warn("Skip in process for item " + item, t);
+		
+	}
+
 }
