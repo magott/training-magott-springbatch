@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -45,7 +44,7 @@ public class SpursImportJobIntegrationTest extends JobLauncherTestUtils{
 	@Test
 	public void jobCompletesSuccessfully() throws Exception{
 		
-		JobExecution jobExecution = launchJob(new JobParametersBuilder().addString("foo", "bar").toJobParameters());
+		JobExecution jobExecution = launchJob();
 		assertThat(jobExecution.getExitStatus().getExitCode(), equalTo(ExitStatus.COMPLETED.getExitCode()));
 	}
 	
