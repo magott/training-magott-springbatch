@@ -7,13 +7,7 @@
 		<step id="fileImport">
 			<tasklet>
 				<chunk reader="resultsReader" processor="matchFilter" writer="resultsDbWriter"
-				 commit-interval="10" skip-limit="1">
-					<skippable-exception-classes>
-						<include class="java.lang.RuntimeException"/>
-					</skippable-exception-classes>
-					<listeners>
-						<listener ref="skipListener"/>
-					</listeners>
+				 commit-interval="10">
 				</chunk>
 			</tasklet>
 		</step>
@@ -52,5 +46,4 @@
 		</property>
 	</bean>
 
-	<bean id="skipListener" class="no.magott.training.ex1.LoggingSkipListener" />
 </beans>

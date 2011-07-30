@@ -16,17 +16,15 @@
 package no.magott.training.ex1;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,29 +36,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public class SpursImportJobSkipIntegrationTest extends JobLauncherTestUtils{
 
-	@Autowired
-	FlatFileItemReader<SpursMatch> spursMatchReader;
-	
 	@Test
 	public void jobCompletesSuccessfully() throws Exception{
 		JobExecution jobExecution = launchJob();
 		assertThat(jobExecution.getExitStatus().getExitCode(), equalTo(ExitStatus.COMPLETED.getExitCode()));
-	}
-	
-	@Test
-	public void spursTrashedAr5ena1() throws Exception{
-		int lineNumber = 1;//Reader configured to skip first (header) row
-		
-		spursMatchReader.open(new ExecutionContext());
-		//Will skip through first 141 rows in file
-		while(lineNumber++ < 141 ){
-			spursMatchReader.read();
-		}
-		SpursMatch spursMatch = spursMatchReader.read();
-		assertThat(spursMatch.isSpursWin(), is(true));
-		assertThat(spursMatch.getOpposition(), equalTo("Arsenal"));
-		assertThat(spursMatch.getSpursGoals(), equalTo(5));
-		assertThat(spursMatch.getOppositionGoals(), equalTo(1));
+		StepExecution stepExecution = jobExecution.getStepExecutions().iterator().next();
+		assertThat(stepExecution.getSkipCount(), not(equalTo(0)));
 	}
 	
 }

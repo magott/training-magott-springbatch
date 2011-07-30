@@ -7,10 +7,7 @@
 		<step id="fileImport">
 			<tasklet>
 				<chunk reader="resultsReader" processor="matchFilter" writer="resultsConsoleWriter"
-					commit-interval="10"  retry-limit="10">
-					<retryable-exception-classes>
-						<include class="java.lang.RuntimeException"/>
-					</retryable-exception-classes>
+					commit-interval="10" >
 				</chunk>
 			</tasklet>
 		</step>
