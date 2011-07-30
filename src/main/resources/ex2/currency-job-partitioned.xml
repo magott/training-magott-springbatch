@@ -19,9 +19,7 @@
 			</tasklet>
 		</step>
 		<step id="nokGbpPartitioned">
-			<partition step="nokGbp" partitioner="partitioner">
-				<handler grid-size="2" task-executor="taskExecutor" />
-			</partition>
+			<!-- TODO: Configure with partitioning -->
 		</step>
 	</job>
 
@@ -78,10 +76,10 @@
 		</property>
 	</bean>
 
-	<bean id="exchangeRateDbReader" class="org.springframework.batch.item.database.JdbcPagingItemReader" scope="step">
+	<bean id="exchangeRateDbReader" class="org.springframework.batch.item.database.JdbcPagingItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="rowMapper">
-			<bean class="no.magott.training.ex2.ExchangeRateRowMapper" />
+			<bean class="no.magott.training.ex2.ExchangeRateRowMapper"/>
 		</property>
 		<property name="queryProvider">
 			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
@@ -89,14 +87,7 @@
 				<property name="sortKey" value="ID" />
 				<property name="selectClause" value="SELECT ID, EXCHANGE_DATE, FROM_CURRENCY, TO_CURRENCY, EXCHANGE_RATE" />
 				<property name="fromClause" value="FROM EXCHANGE_RATE" />
-				<property name="whereClause" value="WHERE ID >= :min AND ID &lt;= :max" />
 			</bean>
-		</property>
-		<property name="parameterValues">
-			<map>
-				<entry key="min" value="#{stepExecutionContext[minValue]}" />
-				<entry key="max" value="#{stepExecutionContext[maxValue]}" />
-			</map>
 		</property>
 	</bean>
 

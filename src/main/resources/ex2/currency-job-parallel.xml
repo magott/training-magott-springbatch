@@ -5,29 +5,22 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<context:annotation-config />
+	<context:annotation-config/>
 
 	<job id="currencyImport" xmlns="http://www.springframework.org/schema/batch">
-		<split id="fileImports" task-executor="taskExecutor" next="reversedER">
-			<flow>
-				<step id="nokImport">
-					<tasklet>
-						<chunk reader="nokReader" processor="exchangeRateFilter" writer="exchangeRateDbWriter" commit-interval="10" />
-					</tasklet>
-				</step>
-			</flow>
-			<flow>
-				<step id="gbpImport">
-					<tasklet>
-						<chunk reader="gbpReader" processor="exchangeRateFilter" writer="exchangeRateDbWriter" commit-interval="10" />
-					</tasklet>
-				</step>
-			</flow>
-		</split>
-		<step id="reversedER">
+		<step id="nokImport" next="gbpImport">
 			<tasklet>
-				<chunk reader="exchangeRateDbReader" processor="exchangeRateProducer" writer="exchangeRateReverseDbWriter"
-					commit-interval="10" />
+				<chunk reader="nokReader" processor="exchangeRateFilter" writer="exchangeRateDbWriter" commit-interval="10" />
+			</tasklet>
+		</step>
+		<step id="gbpImport" next="nokGbp">
+			<tasklet>
+				<chunk reader="gbpReader" processor="exchangeRateFilter" writer="exchangeRateDbWriter" commit-interval="10" />
+			</tasklet>
+		</step>
+		<step id="nokGbp">
+			<tasklet>
+				<chunk reader="exchangeRateDbReader" processor="exchangeRateProducer" writer="exchangeRateReverseDbWriter" commit-interval="10" />
 			</tasklet>
 		</step>
 	</job>
@@ -59,7 +52,7 @@
 
 	<bean id="exchangeRateFieldSetMapper" class="no.magott.training.ex2.ExchangeRateFieldSetMapper" />
 	<bean id="exchangeRateFilter" class="no.magott.training.ex2.ExchangeRateFilterItemProcessor" />
-
+	
 	<bean id="exchangeRateDbWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
@@ -68,7 +61,7 @@
 			<bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
 		</property>
 	</bean>
-
+	
 	<bean id="exchangeRateReverseDbWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
@@ -77,11 +70,11 @@
 			<bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
 		</property>
 	</bean>
-
+	
 	<bean id="exchangeRateDbReader" class="org.springframework.batch.item.database.JdbcPagingItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="rowMapper">
-			<bean class="no.magott.training.ex2.ExchangeRateRowMapper" />
+			<bean class="no.magott.training.ex2.ExchangeRateRowMapper"/>
 		</property>
 		<property name="queryProvider">
 			<bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
@@ -92,12 +85,8 @@
 			</bean>
 		</property>
 	</bean>
-
-	<bean id="exchangeRateProducer" class="no.magott.training.ex2.ExchangeRateProducerItemProcessor" />
-
-	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-		<property name="corePoolSize" value="4" />
-	</bean>
+	
+	<bean id="exchangeRateProducer" class="no.magott.training.ex2.ExchangeRateProducerItemProcessor"/>
 
 </beans>
 

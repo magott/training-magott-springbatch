@@ -19,7 +19,8 @@
 			</tasklet>
 		</step>
 		<step id="nokGbp">
-			<tasklet task-executor="taskExecutor" throttle-limit="10">
+		<!-- Configure to be multi-threaded -->
+			<tasklet>
 				<chunk reader="exchangeRateDbReader" processor="exchangeRateProducer" writer="exchangeRateReverseDbWriter"
 					commit-interval="10" />
 			</tasklet>
@@ -70,10 +71,6 @@
 		<property name="itemSqlParameterSourceProvider">
 			<bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
 		</property>
-	</bean>
-
-	<bean id="exchangeRateDbReader" class="no.magott.training.ex2.MultiThreadedExchangeRateItemReader">
-		<property name="dataSource" ref="dataSource" />
 	</bean>
 
 	<bean id="exchangeRateProducer" class="no.magott.training.ex2.ExchangeRateProducerItemProcessor" />
